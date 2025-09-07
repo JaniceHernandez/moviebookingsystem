@@ -43,10 +43,10 @@ class Movie{
         return Movie.cache;
     } 
     
-    // Find movie by ID (from cache)
-    static async getMovieById(movie_Id) {
+    // Find movie by title (from cache)
+    static async getMovieByTitle(movie) {
         const all = await Movie.getAllMovies();
-        return all.find(m => m.movieId === movie_Id) || null;
+        return all.find(m => m.title === movie) || null;
     }
 
     // Get movies by status (Coming Soon, Now Showing, Ended) for tab views

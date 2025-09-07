@@ -7,8 +7,8 @@ async function runTests() {
   console.log("🎬 All Movies:");
   console.log(await Movie.getAllMovies());
 
-  console.log("\n🎬 Movie by ID (1):");
-  console.log(await Movie.getMovieById(1));
+  console.log("\n🎬 Movie by title:");//for searching?
+  console.log(await Movie.getMovieByTitle("Movie The Smashing Machine"));
 
   console.log("\n🎬 Now Showing Movies:");
   console.log(await Movie.getMoviesByStatus("Now Showing"));
