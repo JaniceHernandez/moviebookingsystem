@@ -15,17 +15,26 @@ class Movie{
         this.endDate = row.END_DATE;
         this.languageId = row.LANGUAGE_ID;
         this.mediaId = row.MEDIA_ID;
-        this.status = Movie.computeStatus(row.release_date, row.end_date);
+        this.status = Movie.computeStatus(row.RELEASE_DATE, row.END_DATE);
     }
 
     // Compute movie status based on current date and release/end dates
-    static computeStatus(releaseDate, endDate){
+    static computeStatus(releaseDate, endDate) {
+        if (!releaseDate || !endDate) return 'Unknown';
         const today = new Date();
-        const start = new Date(releaseDate);
-        const end = new Date(endDate);
 
-        if(today < start) return 'Coming Soon';
-        if(today >= start && today <= end) return 'Now Showing';
+        // Parse releaseDate and endDate (format YYYY-MM-DD)
+        const [rYear, rMonth, rDay] = releaseDate.split('-').map(Number); //→ ['2025','09','07']
+        const [eYear, eMonth, eDay] = endDate.split('-').map(Number); //converts each string to a number.
+
+        // Convert today to YYYYMMDD number
+        const todayNum = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+        const startNum = rYear * 10000 + rMonth * 100 + rDay;
+        const endNum = eYear * 10000 + eMonth * 100 + eDay; //20250000 + 900 + 7 = 20250907
+
+        // Compare numeric dates
+        if (todayNum < startNum) return 'Coming Soon';
+        if (todayNum >= startNum && todayNum <= endNum) return 'Now Showing';
         return 'Ended';
     }
 
@@ -43,7 +52,7 @@ class Movie{
         return Movie.cache;
     } 
     
-    // Find movie by title (from cache)
+    // Find movie by title (from cache/storage)
     static async getMovieByTitle(movie) {
         const all = await Movie.getAllMovies();
         return all.find(m => m.title === movie) || null;
