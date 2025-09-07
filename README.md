@@ -12,7 +12,7 @@ A simple movie booking system built with Node.js that lets users see movies, che
 ### Tech Used
 * Node.js – backend code in JavaScript
 * Express.js – simple server framework
-* DB2 / SQL – stores movies, casts, and bookings
+* DB2 / SQL – stores static informations and bookings
 * Git – version control for collaborating
 
   ## How to Set Up on Your Computer
