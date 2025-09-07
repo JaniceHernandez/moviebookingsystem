@@ -1,4 +1,4 @@
-# 🎬 Movie Booking System
+# 🎬 Movie Booking System (Development Phase)
 A simple movie booking system built with Node.js that lets users see movies, check if they’re coming soon or now showing, and manage bookings. Perfect for learning how a small movie booking backend works with a database.
 
 ### Features
