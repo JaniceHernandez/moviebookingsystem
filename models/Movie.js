@@ -5,7 +5,7 @@ class Movie{
     static cache = null; // Cache for all movies
 
     //Movie properties
-    constructor(row){
+    constructor(row) {
         this.movieId = row.MOVIE_ID;
         this.title = row.TITLE;
         this.genre = row.GENRE;
