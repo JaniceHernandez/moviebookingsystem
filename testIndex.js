@@ -19,7 +19,7 @@ async function runTests() {
   console.log("\n🖼 Media for Movie 1:");
   console.log(await MovieMedia.getMediaByMovie(1));
 
-  console.log("\n🌍 All Languages:");
+  console.log("\n🌍 Select Languages:");
   console.log(await MovieLanguage.getLanguageByMovie(1));
 }
 

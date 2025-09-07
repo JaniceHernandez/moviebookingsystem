@@ -15,6 +15,7 @@ class Movie{
         this.endDate = row.END_DATE;
         this.languageId = row.LANGUAGE_ID;
         this.mediaId = row.MEDIA_ID;
+        this.ratingId = row.RATING_ID;
         this.status = Movie.computeStatus(row.RELEASE_DATE, row.END_DATE);
     }
 
