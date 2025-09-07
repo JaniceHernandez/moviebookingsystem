@@ -14,13 +14,13 @@ async function runTests() {
   console.log(await Movie.getMoviesByStatus("Now Showing"));
 
   console.log("\n🎭 Cast for Movie 1:");
-  console.log(await MovieCast.getCastByMovie(1));
+  console.log(await MovieCast.getCastsByMovie(1));
 
   console.log("\n🖼 Media for Movie 1:");
   console.log(await MovieMedia.getMediaByMovie(1));
 
   console.log("\n🌍 All Languages:");
-  console.log(await MovieLanguage.getAllLanguages());
+  console.log(await MovieLanguage.getLanguageByMovie(1));
 }
 
 runTests().catch(console.error);

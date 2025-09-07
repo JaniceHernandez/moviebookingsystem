@@ -10,10 +10,10 @@ class MovieMedia {
 
     static async getMediaByMovie(movieId) {
     const conn = await openConnection();
-    try {
-      const rows = await conn.query("SELECT * FROM MovieMedia WHERE movie_id = ?", [movieId]);
-      return rows.map(r => new MovieMedia(r));
-    } finally { conn.close(); }
+        try {
+        const rows = await conn.query("SELECT * FROM MovieMedia WHERE movie_id = ?", [movieId]);
+        return rows.map(r => new MovieMedia(r));
+        } finally { conn.close(); }
   }
 }
 

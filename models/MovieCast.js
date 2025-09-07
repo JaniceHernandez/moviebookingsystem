@@ -7,7 +7,7 @@ class MovieCast {
         this.role = row.ROLE;
     }
 
-    static async getCastsByMovieId(movieId) {
+    static async getCastsByMovie(movieId) {
         const conn = await openConnection();
         try {
             const rows = await conn.query("SELECT * FROM MovieCast WHERE MOVIE_ID = ?", [movieId]);

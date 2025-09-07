@@ -6,7 +6,7 @@ class MovieLanguage {
     this.languageName = row.LANGUAGE_NAME;
   }
 
-  static async getLanguageById(languageId) {
+  static async getLanguageByMovie(languageId) {
     const conn = await openConnection();
     try {
       const rows = await conn.query("SELECT * FROM MovieLanguage WHERE language_id = ?", [languageId]);
