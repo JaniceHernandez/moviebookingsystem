@@ -6,14 +6,6 @@ class MovieLanguage {
     this.languageName = row.LANGUAGE_NAME;
   }
 
-  static async getAllLanguages() {
-    const conn = await openConnection();
-    try {
-      const rows = await conn.query("SELECT * FROM MovieLanguage");
-      return rows.map(r => new MovieLanguage(r));
-    } finally { conn.close(); }
-  }
-
   static async getLanguageById(languageId) {
     const conn = await openConnection();
     try {

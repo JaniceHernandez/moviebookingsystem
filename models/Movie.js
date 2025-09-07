@@ -1,17 +1,20 @@
-const { openConnection } = require('../connection');
+const { openConnection } = require("../connection");
 
 class Movie{
 
+    static cache = null; // Cache for all movies
+
+    //Movie properties
     constructor(row){
-        this.movieId = row.movie_id;
-        this.title = row.title;
-        this.genre = row.genre;
-        this.director = row.director;
-        this.description = row.description;
-        this.releaseDate = row.release_date;
-        this.endDate = row.end_date;
-        this.languageId = row.language_id;
-        this.mediaId = row.media_id;
+        this.movieId = row.MOVIE_ID;
+        this.title = row.TITLE;
+        this.genre = row.GENRE;
+        this.director = row.DIRECTOR;
+        this.description = row.DESCRIPTION;
+        this.releaseDate = row.RELEASE_DATE;
+        this.endDate = row.END_DATE;
+        this.languageId = row.LANGUAGE_ID;
+        this.mediaId = row.MEDIA_ID;
         this.status = Movie.computeStatus(row.release_date, row.end_date);
     }
 
@@ -21,23 +24,29 @@ class Movie{
         const start = new Date(releaseDate);
         const end = new Date(endDate);
 
-        if(today < start) return 'Comming Soon';
-        if(today >= start && now <= end) return 'Now Showing';
+        if(today < start) return 'Coming Soon';
+        if(today >= start && today <= end) return 'Now Showing';
         return 'Ended';
     }
 
-    static async getAllMovies(){
+    // Fetch all movies (from DB if cache is empty)
+    static async getAllMovies() {
+        if (!Movie.cache) {
         const conn = await openConnection();
-        try{
+        try {
             const rows = await conn.query("SELECT * FROM Movie");
-            return rows.map(r => new Movie(r)); // Create Movie instances
-        } finally { conn.close(); }
-    }  
+            Movie.cache = rows.map(r => new Movie(r)); 
+        } finally { 
+            conn.close(); 
+        }
+      }
+        return Movie.cache;
+    } 
     
     // Find movie by ID (from cache)
-    static async getMovieById(movieId) {
+    static async getMovieById(movie_Id) {
         const all = await Movie.getAllMovies();
-        return all.find(m => m.movie_id === movieId) || null;
+        return all.find(m => m.movieId === movie_Id) || null;
     }
 
     // Get movies by status (Coming Soon, Now Showing, Ended) for tab views
@@ -45,6 +54,11 @@ class Movie{
         const all = await Movie.getAllMovies();
         return all.filter(m => m.status === status);
     }
+
+    // Invalidate cache when admin changes data
+    static invalidateCache() {
+        Movie.cache = null;
+  }
 }
 
 module.exports = Movie;     
