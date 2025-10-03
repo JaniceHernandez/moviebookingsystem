@@ -13,6 +13,7 @@ class Movie{
         this.description = row.DESCRIPTION;
         this.releaseDate = row.RELEASE_DATE;
         this.endDate = row.END_DATE;
+        this.duration = row.DURATION;
         this.languageId = row.LANGUAGE_ID;
         this.mediaId = row.MEDIA_ID;
         this.ratingId = row.RATING_ID;
