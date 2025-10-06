@@ -1,0 +1,7 @@
+rating_id,code,description
+R01,G,General Audience suitable for all ages
+R02,PG,Parental Guidance some material may not be suitable for children
+R03,R-13,Restricted 13 may be unsuitable for children under 13
+R04,R-16,Restricted 16 may be unsuitable for children under 16
+R05,R-18,Restricted 18 only for adults
+R06,X,Not for public exhibition
