@@ -1,61 +1,61 @@
 cast_id,movie_id,actor_name,role
-1,1,Sam Rockwell,Lead
-2,1,Marc Maron,Supporting
-3,1,Craig Robinson,Supporting
-4,2,Liam Neeson,Frank Drebin
-5,2,Paul Walter Hauser,Supporting
-6,2,Kevin Durand,Supporting
-7,3,Jamie Lee Curtis,Tess Coleman
-8,3,Julia Butler,Supporting
-9,3,Chad Michael Murray,Supporting
-10,4,Julia Garner,Lead
-11,4,Josh Brolin,Supporting
-12,4,Alden Ehrenreich,Supporting
-13,5,Bob Odenkirk,Hutch Mansell
-14,5,Connie Nielsen,Supporting
-15,5,Sharon Stone,Supporting
-16,6,Sydney Sweeney,Lead
-17,6,Paul Walter Hauser,Supporting
-18,6,Zahn McClarnon,Supporting
-19,7,Austin Butler,Hank Thompson
-20,7,Zoë Kravitz,Supporting
-21,7,Vincent D’Onofrio,Supporting
-22,8,Peter Dinklage,Lead
-23,8,Taylour Paige,Supporting
-24,8,Jacob Tremblay,Supporting
-25,9,Benedict Cumberbatch,Theo
-26,9,Olivia Colman,Ivy
-27,9,Kate McKinnon,Supporting
-28,10,Anthony Mackie,Captain America
-29,10,Danny Ramirez,Supporting
-30,10,Shira Haas,Supporting
-31,11,Vera Farmiga,Lorraine Warren
-32,11,Patrick Wilson,Ed Warren
-33,11,Ben Hardy,Supporting
-34,12,Hugh Bonneville,Robert Crawley
-35,12,Elizabeth McGovern,Cora Crawley
-36,12,Michelle Dockery,Mary Crawley
-37,13,Michael McKean,David St. Hubbins
-38,13,Christopher Guest,Nigel Tufnel
-39,13,Harry Shearer,Derek Smalls
-40,14,Cooper Hoffman,Lead
-41,14,David Jonsson,Supporting
-42,14,Mark Hamill,Supporting
-43,15,Lili Reinhart,Lead
-44,15,Daniela Melchior,Supporting
-45,15,Jeremy Ang Jones,Supporting
-46,16,Tyriq Withers,Lead
-47,16,Marlon Wayans,Supporting
-48,16,Julia Fox,Supporting
-49,17,Leonardo DiCaprio,Lead
-50,17,Sean Penn,Supporting
-51,17,Regina Hall,Supporting
-52,18,Madelaine Petsch,Maya
-53,18,Rachel Shenton,Supporting
-54,18,Richard Brake,Supporting
-55,19,Dwayne Johnson,Mark Kerr
-56,19,Emily Blunt,Supporting
-57,19,Ryan Bader,Supporting
-58,20,Julia Roberts,Lead
-59,20,Andrew Garfield,Supporting
-60,20,Aisling Franciosi,Supporting
+1,1,"Sam Rockwell","Lead"
+2,1,"Marc Maron","Supporting"
+3,1,"Craig Robinson","Supporting"
+4,2,"Liam Neeson","Frank Drebin"
+5,2,"Paul Walter Hauser","Supporting"
+6,2,"Kevin Durand","Supporting"
+7,3,"Jamie Lee Curtis","Tess Coleman"
+8,3,"Julia Butler","Supporting"
+9,3,"Chad Michael Murray","Supporting"
+10,4,"Julia Garner","Lead"
+11,4,"Josh Brolin","Supporting"
+12,4,"Alden Ehrenreich","Supporting"
+13,5,"Bob Odenkirk","Hutch Mansell"
+14,5,"Connie Nielsen","Supporting"
+15,5,"Sharon Stone","Supporting"
+16,6,"Sydney Sweeney","Lead"
+17,6,"Paul Walter Hauser","Supporting"
+18,6,"Zahn McClarnon","Supporting"
+19,7,"Austin Butler","Hank Thompson"
+20,7,"Zoe Kravitz","Supporting"
+21,7,"Vincent Donofrio","Supporting"
+22,8,"Peter Dinklage","Lead"
+23,8,"Taylour Paige","Supporting"
+24,8,"Jacob Tremblay","Supporting"
+25,9,"Benedict Cumberbatch","Theo"
+26,9,"Olivia Colman","Ivy"
+27,9,"Kate McKinnon","Supporting"
+28,10,"Anthony Mackie","Captain America"
+29,10,"Danny Ramirez","Supporting"
+30,10,"Shira Haas","Supporting"
+31,11,"Vera Farmiga","Lorraine Warren"
+32,11,"Patrick Wilson","Ed Warren"
+33,11,"Ben Hardy","Supporting"
+34,12,"Hugh Bonneville","Robert Crawley"
+35,12,"Elizabeth McGovern","Cora Crawley"
+36,12,"Michelle Dockery","Mary Crawley"
+37,13,"Michael McKean","David St. Hubbins"
+38,13,"Christopher Guest","Nigel Tufnel"
+39,13,"Harry Shearer","Derek Smalls"
+40,14,"Cooper Hoffman","Lead"
+41,14,"David Jonsson","Supporting"
+42,14,"Mark Hamill","Supporting"
+43,15,"Lili Reinhart","Lead"
+44,15,"Daniela Melchior","Supporting"
+45,15,"Jeremy Ang Jones","Supporting"
+46,16,"Tyriq Withers","Lead"
+47,16,"Marlon Wayans","Supporting"
+48,16,"Julia Fox","Supporting"
+49,17,"Leonardo DiCaprio","Lead"
+50,17,"Sean Penn","Supporting"
+51,17,"Regina Hall","Supporting"
+52,18,"Madelaine Petsch","Maya"
+53,18,"Rachel Shenton","Supporting"
+54,18,"Richard Brake","Supporting"
+55,19,"Dwayne Johnson","Mark Kerr"
+56,19,"Emily Blunt","Supporting"
+57,19,"Ryan Bader","Supporting"
+58,20,"Julia Roberts","Lead"
+59,20,"Andrew Garfield","Supporting"
+60,20,"Aisling Franciosi","Supporting"
