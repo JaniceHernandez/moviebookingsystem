@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "dotenv": "^17.2.2",
-    "ibm_db": "^3.3.2"
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "ibm_db": "^3.3.4"
   }
 }

@@ -1,5 +1,5 @@
 require("dotenv").config();
-const path = require("path");
+//const path = require("path");
 const ibmdb = require("ibm_db");
 
 const connStr =

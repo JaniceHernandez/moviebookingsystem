@@ -1,4 +1,4 @@
-const Movie = require("./models/Movie");
+const Movie = require("./models/MovieModel");
 const MovieCast = require("./models/MovieCast");
 const MovieMedia = require("./models/MovieMedia");
 const MovieLanguage = require("./models/MovieLanguage");
