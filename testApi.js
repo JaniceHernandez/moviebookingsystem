@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const API_BASE = 'http://localhost:3000/api/movies'; // adjust if needed
+const API_BASE = 'http://localhost:3000/api/movies'; // adjust port if needed
 
 async function testGetAllMovies() {
   try {
@@ -9,7 +9,7 @@ async function testGetAllMovies() {
     console.log(`Movies count: ${res.data.count}`);
     console.log('Sample movie:', JSON.stringify(res.data.data[0], null, 2));
   } catch (err) {
-    console.error('Error fetching all movies:', err.response?.data || err.message);
+    console.error('Error fetching all movies:', err.message);
   }
 }
 
@@ -38,7 +38,9 @@ async function testGetShowtimes(movieId, date) {
     const res = await axios.get(`${API_BASE}/showtimes`, { params: { movieId, date } });
     console.log(`GET /api/movies/showtimes?movieId=${movieId}&date=${date}`);
     console.log(`Showtimes count: ${res.data.count}`);
-    console.log('Sample showtime:', JSON.stringify(res.data.data[0], null, 2));
+    if (res.data.count > 0) {
+      console.log('Sample showtime:', JSON.stringify(res.data.data[0], null, 2));
+    }
   } catch (err) {
     console.error(`Error fetching showtimes for movieId=${movieId} on ${date}:`, err.message);
   }
@@ -47,14 +49,18 @@ async function testGetShowtimes(movieId, date) {
 async function runTests() {
   await testGetAllMovies();
   console.log('----');
-  
-  await testGetMovieByTitle('Example Movie'); // replace with actual title
+
+  const sampleTitle = 'Example Movie'; // replace with a known movie title from your DB
+  await testGetMovieByTitle(sampleTitle);
   console.log('----');
-  
-  await testGetMoviesByStatus('Now Showing');
+
+  const sampleStatus = 'Now Showing'; // or Coming Soon, Ended
+  await testGetMoviesByStatus(sampleStatus);
   console.log('----');
-  
-  await testGetShowtimes(1, '2025-10-07'); // replace with actual movieId and date
+
+  const sampleMovieId = 1; // replace with valid movie_id
+  const sampleDate = '2025-10-07'; // replace with valid show_date
+  await testGetShowtimes(sampleMovieId, sampleDate);
   console.log('----');
 }
 
