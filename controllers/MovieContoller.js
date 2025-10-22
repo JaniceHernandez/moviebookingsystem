@@ -1,4 +1,4 @@
-const MovieModel = require('../models/movie');
+const MovieModel = require('../models/MovieModel');
 
 class MovieController {
   // Get all movies or filter by status

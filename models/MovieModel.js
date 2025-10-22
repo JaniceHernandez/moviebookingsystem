@@ -1,20 +1,21 @@
-const { openConnection } = require("../connection");
-class MovieModel{
+const { openConnection } = require('../connection');
+
+class MovieModel {
   static cache = null; // Cache for movie data
 
   constructor(row) {
-    this.movieId = row.movie_id;
-    this.title = row.title;
-    this.director = row.director;
-    this.description = row.description;
-    this.releaseDate = row.release_date;
-    this.endDate = row.end_date;
-    this.duration = row.duration;
-    this.language = row.language_name;
-    this.rating = { code: row.rating_code, description: row.rating_description };
-    this.genres = row.genres ? row.genres.split(',') : []; // Genres as array
-    this.poster = row.poster_path; // Primary poster path
-    this.status = MovieModel.computeStatus(row.release_date, row.end_date);
+    this.movieId = row.MOVIE_ID;
+    this.title = row.TITLE;
+    this.director = row.DIRECTOR;
+    this.description = row.DESCRIPTION;
+    this.releaseDate = row.RELEASE_DATE;
+    this.endDate = row.END_DATE;
+    this.duration = row.DURATION;
+    this.language = row.LANGUAGE_NAME;
+    this.rating = { code: row.RATING_CODE, description: row.RATING_DESCRIPTION };
+    this.genres = row.GENRES ? row.GENRES.split(',') : []; // Genres as array
+    this.poster = row.POSTER_PATH; // Primary poster path
+    this.status = MovieModel.computeStatus(row.RELEASE_DATE, row.END_DATE);
   }
 
   // Compute movie status based on current date
@@ -34,28 +35,38 @@ class MovieModel{
   // Fetch all movies with related data (genres, language, rating, primary poster)
   static async getAllMovies() {
     if (!MovieModel.cache) {
+      let conn;
       try {
+        conn = await openConnection();
         const query = `
           SELECT 
-            m.movie_id, m.title, m.director, m.description, 
-            m.release_date, m.end_date, m.duration,
-            l.name AS language_name,
-            r.code AS rating_code, r.description AS rating_description,
-            STRING_AGG(g.name, ',') AS genres,
-            (SELECT path FROM media md WHERE md.movie_id = m.movie_id AND md.is_primary = 1 LIMIT 1) AS poster_path
-          FROM movie m
-          LEFT JOIN language l ON m.language_id = l.language_id
-          LEFT JOIN rating r ON m.rating_id = r.rating_id
-          LEFT JOIN movieGenre mg ON m.movie_id = mg.movie_id
-          LEFT JOIN genre g ON mg.genre_id = g.genre_id
-          GROUP BY m.movie_id, l.name, r.code, r.description
-          ORDER BY m.title;
+            m."MOVIE_ID" AS MOVIE_ID, 
+            m."TITLE" AS TITLE, 
+            m."DIRECTOR" AS DIRECTOR, 
+            m."DESCRIPTION" AS DESCRIPTION, 
+            m."RELEASE_DATE" AS RELEASE_DATE, 
+            m."END_DATE" AS END_DATE, 
+            m."DURATION" AS DURATION,
+            l."NAME" AS LANGUAGE_NAME,
+            r."CODE" AS RATING_CODE, 
+            r."DESCRIPTION" AS RATING_DESCRIPTION,
+            LISTAGG(g."NAME", ',') WITHIN GROUP (ORDER BY g."NAME") AS GENRES,
+            (SELECT "PATH" FROM "MEDIA" md WHERE md."MOVIE_ID" = m."MOVIE_ID" AND md."IS_PRIMARY" = 1 FETCH FIRST 1 ROW ONLY) AS POSTER_PATH
+          FROM "MOVIE" m
+          LEFT JOIN "LANGUAGE" l ON m."LANGUAGE_ID" = l."LANGUAGE_ID"
+          LEFT JOIN "RATING" r ON m."RATING_ID" = r."RATING_ID"
+          LEFT JOIN "MOVIEGENRE" mg ON m."MOVIE_ID" = mg."MOVIE_ID"
+          LEFT JOIN "GENRE" g ON mg."GENRE_ID" = g."GENRE_ID"
+          GROUP BY m."MOVIE_ID", m."TITLE", m."DIRECTOR", m."DESCRIPTION", m."RELEASE_DATE", m."END_DATE", m."DURATION", l."NAME", r."CODE", r."DESCRIPTION"
+          ORDER BY m."TITLE";
         `;
-        const { rows } = await openConnection.query(query);
+        const rows = await conn.query(query);
         MovieModel.cache = rows.map(row => new MovieModel(row));
       } catch (error) {
         console.error('Error fetching movies:', error);
         throw new Error('Failed to fetch movies');
+      } finally {
+        if (conn) await conn.close();
       }
     }
     return MovieModel.cache;
@@ -75,60 +86,77 @@ class MovieModel{
 
   // Fetch showtimes for a movie on a specific date
   static async getShowtimesByMovie(movieId, showDate) {
+    let conn;
     try {
+      conn = await openConnection();
       const query = `
         SELECT 
-          s.showtime_id, s.show_date, s.show_time, s.price, s.seats_booked,
-          c.cinema_id, c.name AS cinema_name,
-          l.name AS location_name, st.name AS screen_type,
-          st.seat_capacity
-        FROM showtime s
-        JOIN cinema c ON s.cinema_id = c.cinema_id
-        JOIN location l ON c.location_id = l.location_id
-        JOIN screenType st ON c.screen_type_id = st.screen_type_id
-        WHERE s.movie_id = $1 AND s.show_date = $2 AND s.sched_status = 'scheduled'
-        ORDER BY s.show_time;
+          s."SHOWTIME_ID" AS SHOWTIME_ID, 
+          s."SHOW_DATE" AS SHOW_DATE, 
+          s."SHOW_TIME" AS SHOW_TIME, 
+          s."PRICE" AS PRICE, 
+          s."SEATS_BOOKED" AS SEATS_BOOKED,
+          c."CINEMA_ID" AS CINEMA_ID, 
+          c."NAME" AS CINEMA_NAME,
+          l."NAME" AS LOCATION_NAME, 
+          st."NAME" AS SCREEN_TYPE,
+          st."SEAT_CAPACITY" AS SEAT_CAPACITY
+        FROM "SHOWTIME" s
+        JOIN "CINEMA" c ON s."CINEMA_ID" = c."CINEMA_ID"
+        JOIN "LOCATION" l ON c."LOCATION_ID" = l."LOCATION_ID"
+        JOIN "SCREENTYPE" st ON c."SCREEN_TYPE_ID" = st."SCREEN_TYPE_ID"
+        WHERE s."MOVIE_ID" = ? AND s."SHOW_DATE" = ? AND s."SCHED_STATUS" = 'scheduled'
+        ORDER BY s."SHOW_TIME";
       `;
-      const { rows } = await openConnection.query(query, [movieId, showDate]);
+      const rows = await conn.query(query, [movieId, showDate]);
       return rows.map(row => ({
-        showtimeId: row.showtime_id,
-        showDate: row.show_date,
-        showTime: row.show_time,
-        price: row.price,
-        seatsAvailable: row.seat_capacity - row.seats_booked,
+        showtimeId: row.SHOWTIME_ID,
+        showDate: row.SHOW_DATE,
+        showTime: row.SHOW_TIME,
+        price: row.PRICE,
+        seatsAvailable: row.SEAT_CAPACITY - row.SEATS_BOOKED,
         cinema: {
-          id: row.cinema_id,
-          name: row.cinema_name,
-          location: row.location_name,
-          screenType: row.screen_type,
+          id: row.CINEMA_ID,
+          name: row.CINEMA_NAME,
+          location: row.LOCATION_NAME,
+          screenType: row.SCREEN_TYPE,
         },
       }));
     } catch (error) {
       console.error('Error fetching showtimes:', error);
       throw new Error('Failed to fetch showtimes');
+    } finally {
+      if (conn) await conn.close();
     }
   }
 
   // Fetch additional media for a movie
   static async getMediaByMovie(movieId) {
+    let conn;
     try {
+      conn = await openConnection();
       const query = `
         SELECT 
-          media_id, path, media_type, is_primary
-        FROM media
-        WHERE movie_id = $1 AND is_primary = 0
-        ORDER BY media_id;
+          "MEDIA_ID" AS MEDIA_ID, 
+          "PATH" AS PATH, 
+          "MEDIA_TYPE" AS MEDIA_TYPE, 
+          "IS_PRIMARY" AS IS_PRIMARY
+        FROM "MEDIA"
+        WHERE "MOVIE_ID" = ? AND "IS_PRIMARY" = 0
+        ORDER BY "MEDIA_ID";
       `;
-      const { rows } = await openConnection.query(query, [movieId]);
+      const rows = await conn.query(query, [movieId]);
       return rows.map(row => ({
-        mediaId: row.media_id,
-        path: row.path,
-        mediaType: row.media_type,
-        isPrimary: row.is_primary,
+        mediaId: row.MEDIA_ID,
+        path: row.PATH,
+        mediaType: row.MEDIA_TYPE,
+        isPrimary: row.IS_PRIMARY,
       }));
     } catch (error) {
       console.error('Error fetching media for movie:', error);
       throw new Error('Failed to fetch media for movie');
+    } finally {
+      if (conn) await conn.close();
     }
   }
 
