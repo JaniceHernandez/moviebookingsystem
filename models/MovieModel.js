@@ -2,6 +2,8 @@ const { openConnection } = require('../connection');
 
 class MovieModel {
   static cache = null; // Cache for movie data
+  static cacheTimestamp = null; // Timestamp for cache
+  static CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
   constructor(row) {
     this.movieId = row.MOVIE_ID;
@@ -13,7 +15,7 @@ class MovieModel {
     this.duration = row.DURATION;
     this.language = row.LANGUAGE_NAME;
     this.rating = { code: row.RATING_CODE, description: row.RATING_DESCRIPTION };
-    this.genres = row.GENRES ? row.GENRES.split(',') : []; // Genres as array
+    this.genres = row.GENRES ? row.GENRES.split(',').map(g => g.trim()) : []; // Trim genres
     this.poster = row.POSTER_PATH; // Primary poster path
     this.status = MovieModel.computeStatus(row.RELEASE_DATE, row.END_DATE);
   }
@@ -32,44 +34,60 @@ class MovieModel {
     return 'Ended';
   }
 
+  // Check if cache is valid
+  static isCacheValid() {
+    if (!MovieModel.cache || !MovieModel.cacheTimestamp) return false;
+    const now = Date.now();
+    return (now - MovieModel.cacheTimestamp) < MovieModel.CACHE_DURATION;
+  }
+
   // Fetch all movies with related data (genres, language, rating, primary poster)
   static async getAllMovies() {
-    if (!MovieModel.cache) {
-      let conn;
-      try {
-        conn = await openConnection();
-        const query = `
-          SELECT 
-            m.movie_id AS MOVIE_ID, 
-            m.title AS TITLE, 
-            m.director AS DIRECTOR, 
-            CAST(m.description AS VARCHAR(1000)) AS DESCRIPTION, 
-            m.release_date AS RELEASE_DATE, 
-            m.end_date AS END_DATE, 
-            m.duration AS DURATION,
-            l.name AS LANGUAGE_NAME,
-            r.code AS RATING_CODE, 
-            r.description AS RATING_DESCRIPTION,
-            LISTAGG(g.name, ',') WITHIN GROUP (ORDER BY g.name) AS GENRES,
-            (SELECT path FROM media md WHERE md.movie_id = m.movie_id AND md.is_primary = 1 FETCH FIRST 1 ROW ONLY) AS POSTER_PATH
-          FROM movie m
-          LEFT JOIN language l ON m.language_id = l.language_id
-          LEFT JOIN rating r ON m.rating_id = r.rating_id
-          LEFT JOIN movieGenre mg ON m.movie_id = mg.movie_id
-          LEFT JOIN genre g ON mg.genre_id = g.genre_id
-          GROUP BY m.movie_id, m.title, m.director, m.description, m.release_date, m.end_date, m.duration, l.name, r.code, r.description
-          ORDER BY m.title;
-        `;
-        const rows = await conn.query(query);
-        MovieModel.cache = rows.map(row => new MovieModel(row));
-      } catch (error) {
-        console.error('Error fetching movies:', error);
-        throw new Error('Failed to fetch movies');
-      } finally {
-        if (conn) await conn.close();
+    if (MovieModel.isCacheValid()) {
+      return MovieModel.cache;
+    }
+
+    let conn;
+    try {
+      conn = await openConnection();
+      const query = `
+        SELECT 
+          m.movie_id AS MOVIE_ID, 
+          m.title AS TITLE, 
+          m.director AS DIRECTOR, 
+          CAST(m.description AS VARCHAR(1000)) AS DESCRIPTION, 
+          m.release_date AS RELEASE_DATE, 
+          m.end_date AS END_DATE, 
+          m.duration AS DURATION,
+          l.name AS LANGUAGE_NAME,
+          r.code AS RATING_CODE, 
+          CAST(r.description AS VARCHAR(4000)) AS RATING_DESCRIPTION,
+          (SELECT LISTAGG(g.name, ',') WITHIN GROUP (ORDER BY g.name)
+           FROM movieGenre mg 
+           JOIN genre g ON mg.genre_id = g.genre_id 
+           WHERE mg.movie_id = m.movie_id) AS GENRES,
+          (SELECT path FROM media md WHERE md.movie_id = m.movie_id AND md.is_primary = 1 FETCH FIRST 1 ROW ONLY) AS POSTER_PATH
+        FROM movie m
+        LEFT JOIN language l ON m.language_id = l.language_id
+        LEFT JOIN rating r ON m.rating_id = r.rating_id
+        ORDER BY m.title;
+      `;
+      const rows = await conn.query(query);
+      MovieModel.cache = rows.map(row => new MovieModel(row));
+      MovieModel.cacheTimestamp = Date.now();
+      return MovieModel.cache;
+    } catch (error) {
+      console.error('Error fetching movies:', error);
+      throw new Error('Failed to fetch movies');
+    } finally {
+      if (conn) {
+        try {
+          await conn.close();
+        } catch (closeError) {
+          console.error('Error closing connection:', closeError);
+        }
       }
     }
-    return MovieModel.cache;
   }
 
   // Fetch movie by title
@@ -113,7 +131,7 @@ class MovieModel {
         showtimeId: row.SHOWTIME_ID,
         showDate: row.SHOW_DATE,
         showTime: row.SHOW_TIME,
-        price: row.PRICE,
+        price: Number(row.PRICE).toFixed(2), // Ensure price is formatted
         seatsAvailable: row.SEAT_CAPACITY - row.SEATS_BOOKED,
         cinema: {
           id: row.CINEMA_ID,
@@ -126,7 +144,13 @@ class MovieModel {
       console.error('Error fetching showtimes:', error);
       throw new Error('Failed to fetch showtimes');
     } finally {
-      if (conn) await conn.close();
+      if (conn) {
+        try {
+          await conn.close();
+        } catch (closeError) {
+          console.error('Error closing connection:', closeError);
+        }
+      }
     }
   }
 
@@ -156,13 +180,20 @@ class MovieModel {
       console.error('Error fetching media for movie:', error);
       throw new Error('Failed to fetch media for movie');
     } finally {
-      if (conn) await conn.close();
+      if (conn) {
+        try {
+          await conn.close();
+        } catch (closeError) {
+          console.error('Error closing connection:', closeError);
+        }
+      }
     }
   }
 
   // Invalidate cache (for admin updates)
   static invalidateCache() {
     MovieModel.cache = null;
+    MovieModel.cacheTimestamp = null;
   }
 }
 

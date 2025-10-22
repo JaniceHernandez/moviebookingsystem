@@ -44,6 +44,20 @@ class MovieController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  // Get additional media for a movie
+  static async getMedia(req, res) {
+    try {
+      const { movieId } = req.query;
+      if (!movieId) {
+        return res.status(400).json({ error: 'Movie ID is required' });
+      }
+      const media = await MovieModel.getMediaByMovie(movieId);
+      res.status(200).json(media);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = MovieController;
