@@ -40,25 +40,25 @@ class MovieModel {
         conn = await openConnection();
         const query = `
           SELECT 
-            m."MOVIE_ID" AS MOVIE_ID, 
-            m."TITLE" AS TITLE, 
-            m."DIRECTOR" AS DIRECTOR, 
-            m."DESCRIPTION" AS DESCRIPTION, 
-            m."RELEASE_DATE" AS RELEASE_DATE, 
-            m."END_DATE" AS END_DATE, 
-            m."DURATION" AS DURATION,
-            l."NAME" AS LANGUAGE_NAME,
-            r."CODE" AS RATING_CODE, 
-            r."DESCRIPTION" AS RATING_DESCRIPTION,
-            LISTAGG(g."NAME", ',') WITHIN GROUP (ORDER BY g."NAME") AS GENRES,
-            (SELECT "PATH" FROM "MEDIA" md WHERE md."MOVIE_ID" = m."MOVIE_ID" AND md."IS_PRIMARY" = 1 FETCH FIRST 1 ROW ONLY) AS POSTER_PATH
-          FROM "MOVIE" m
-          LEFT JOIN "LANGUAGE" l ON m."LANGUAGE_ID" = l."LANGUAGE_ID"
-          LEFT JOIN "RATING" r ON m."RATING_ID" = r."RATING_ID"
-          LEFT JOIN "MOVIEGENRE" mg ON m."MOVIE_ID" = mg."MOVIE_ID"
-          LEFT JOIN "GENRE" g ON mg."GENRE_ID" = g."GENRE_ID"
-          GROUP BY m."MOVIE_ID", m."TITLE", m."DIRECTOR", m."DESCRIPTION", m."RELEASE_DATE", m."END_DATE", m."DURATION", l."NAME", r."CODE", r."DESCRIPTION"
-          ORDER BY m."TITLE";
+            m.movie_id AS MOVIE_ID, 
+            m.title AS TITLE, 
+            m.director AS DIRECTOR, 
+            CAST(m.description AS VARCHAR(1000)) AS DESCRIPTION, 
+            m.release_date AS RELEASE_DATE, 
+            m.end_date AS END_DATE, 
+            m.duration AS DURATION,
+            l.name AS LANGUAGE_NAME,
+            r.code AS RATING_CODE, 
+            r.description AS RATING_DESCRIPTION,
+            LISTAGG(g.name, ',') WITHIN GROUP (ORDER BY g.name) AS GENRES,
+            (SELECT path FROM media md WHERE md.movie_id = m.movie_id AND md.is_primary = 1 FETCH FIRST 1 ROW ONLY) AS POSTER_PATH
+          FROM movie m
+          LEFT JOIN language l ON m.language_id = l.language_id
+          LEFT JOIN rating r ON m.rating_id = r.rating_id
+          LEFT JOIN movieGenre mg ON m.movie_id = mg.movie_id
+          LEFT JOIN genre g ON mg.genre_id = g.genre_id
+          GROUP BY m.movie_id, m.title, m.director, m.description, m.release_date, m.end_date, m.duration, l.name, r.code, r.description
+          ORDER BY m.title;
         `;
         const rows = await conn.query(query);
         MovieModel.cache = rows.map(row => new MovieModel(row));
@@ -91,22 +91,22 @@ class MovieModel {
       conn = await openConnection();
       const query = `
         SELECT 
-          s."SHOWTIME_ID" AS SHOWTIME_ID, 
-          s."SHOW_DATE" AS SHOW_DATE, 
-          s."SHOW_TIME" AS SHOW_TIME, 
-          s."PRICE" AS PRICE, 
-          s."SEATS_BOOKED" AS SEATS_BOOKED,
-          c."CINEMA_ID" AS CINEMA_ID, 
-          c."NAME" AS CINEMA_NAME,
-          l."NAME" AS LOCATION_NAME, 
-          st."NAME" AS SCREEN_TYPE,
-          st."SEAT_CAPACITY" AS SEAT_CAPACITY
-        FROM "SHOWTIME" s
-        JOIN "CINEMA" c ON s."CINEMA_ID" = c."CINEMA_ID"
-        JOIN "LOCATION" l ON c."LOCATION_ID" = l."LOCATION_ID"
-        JOIN "SCREENTYPE" st ON c."SCREEN_TYPE_ID" = st."SCREEN_TYPE_ID"
-        WHERE s."MOVIE_ID" = ? AND s."SHOW_DATE" = ? AND s."SCHED_STATUS" = 'scheduled'
-        ORDER BY s."SHOW_TIME";
+          s.showtime_id AS SHOWTIME_ID, 
+          s.show_date AS SHOW_DATE, 
+          s.show_time AS SHOW_TIME, 
+          s.price AS PRICE, 
+          s.seats_booked AS SEATS_BOOKED,
+          c.cinema_id AS CINEMA_ID, 
+          c.name AS CINEMA_NAME,
+          l.name AS LOCATION_NAME, 
+          st.name AS SCREEN_TYPE,
+          st.seat_capacity AS SEAT_CAPACITY
+        FROM showtime s
+        JOIN cinema c ON s.cinema_id = c.cinema_id
+        JOIN location l ON c.location_id = l.location_id
+        JOIN screenType st ON c.screen_type_id = st.screen_type_id
+        WHERE s.movie_id = ? AND s.show_date = ? AND s.sched_status = 'scheduled'
+        ORDER BY s.show_time;
       `;
       const rows = await conn.query(query, [movieId, showDate]);
       return rows.map(row => ({
@@ -137,13 +137,13 @@ class MovieModel {
       conn = await openConnection();
       const query = `
         SELECT 
-          "MEDIA_ID" AS MEDIA_ID, 
-          "PATH" AS PATH, 
-          "MEDIA_TYPE" AS MEDIA_TYPE, 
-          "IS_PRIMARY" AS IS_PRIMARY
-        FROM "MEDIA"
-        WHERE "MOVIE_ID" = ? AND "IS_PRIMARY" = 0
-        ORDER BY "MEDIA_ID";
+          media_id AS MEDIA_ID, 
+          path AS PATH, 
+          media_type AS MEDIA_TYPE, 
+          is_primary AS IS_PRIMARY
+        FROM media
+        WHERE movie_id = ? AND is_primary = 0
+        ORDER BY media_id;
       `;
       const rows = await conn.query(query, [movieId]);
       return rows.map(row => ({
