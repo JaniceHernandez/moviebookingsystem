@@ -1,58 +1,49 @@
-const MovieModel = require('../models/MovieModel');
+const MovieModel = require('../models/movie');
 
-const MovieController = {
-  async listAll(req, res, next) {
-  try {
-    const forceReload = req.query.reload === 'true';
-    if (forceReload) MovieModel.invalidateCache();
-    const movies = await MovieModel.getAllMovies();
-    return res.json({ ok: true, count: movies.length, data: movies });
-  } catch (err) {
-    console.error('Error in listAll:', err);  // log full error details
-    return res.status(500).json({ ok: false, message: 'Internal Server Error', error: err.message });
+class MovieController {
+  // Get all movies or filter by status
+  static async getMovies(req, res) {
+    try {
+      const { status } = req.query;
+      let movies;
+      if (status) {
+        movies = await MovieModel.getMoviesByStatus(status);
+      } else {
+        movies = await MovieModel.getAllMovies();
+      }
+      res.status(200).json(movies);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
-},
 
-  async getByTitle(req, res, next) {
+  // Get movie by title
+  static async getMovieByTitle(req, res) {
     try {
       const { title } = req.params;
       const movie = await MovieModel.getMovieByTitle(title);
-      if (!movie) return res.status(404).json({ ok: false, message: "Movie not found" });
-      return res.json({ ok: true, data: movie });
-    } catch (err) {
-      next(err);
-    }
-  },
-
-  async getByStatus(req, res, next) {
-    try {
-      const { status } = req.params;
-      const movies = await MovieModel.getMoviesByStatus(status);
-      return res.json({ ok: true, count: movies.length, data: movies });
-    } catch (err) {
-      next(err);
-    }
-  },
-
-  async getShowtimes(req, res, next) {
-    try {
-      const { movieId, date } = req.query;
-      if (!movieId || !date) return res.status(400).json({ ok: false, message: "movieId and date are required" });
-      const showtimes = await MovieModel.getShowtimesByMovieAndDate(movieId, date);
-      return res.json({ ok: true, count: showtimes.length, data: showtimes });
-    } catch (err) {
-      next(err);
-    }
-  },
-
-  async invalidateCache(req, res, next) {
-    try {
-      MovieModel.invalidateCache();
-      return res.json({ ok: true, message: "Cache invalidated" });
-    } catch (err) {
-      next(err);
+      if (!movie) {
+        return res.status(404).json({ error: 'Movie not found' });
+      }
+      res.status(200).json(movie);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   }
-};
+
+  // Get showtimes for a movie on a specific date
+  static async getShowtimes(req, res) {
+    try {
+      const { movieId, date } = req.query;
+      if (!movieId || !date) {
+        return res.status(400).json({ error: 'Movie ID and date are required' });
+      }
+      const showtimes = await MovieModel.getShowtimesByMovie(movieId, date);
+      res.status(200).json(showtimes);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+}
 
 module.exports = MovieController;

@@ -1,16 +1,12 @@
 const express = require('express');
-const movieRoutes = require('./routes/movieRoutes');
+const routes = require('./routes');
 
 const app = express();
+
 app.use(express.json());
-
-app.use('/api/movies', movieRoutes);
-
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error("Internal error:", err);
-  res.status(500).json({ ok: false, message: "Internal server error" });
-});
+app.use('/api', routes);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

@@ -1,6 +1,9 @@
-require("dotenv").config();
+//require("dotenv").config();
 //const path = require("path");
+const dotenv = require('dotenv');
 const ibmdb = require("ibm_db");
+dotenv.config();
+
 
 const connStr =
   "DATABASE=" + process.env.DB_NAME +

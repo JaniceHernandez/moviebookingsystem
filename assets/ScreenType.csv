@@ -1,4 +1,4 @@
-screen_type_id,name
-S01,2D
-S02,3D
-S03,IMAX
+screen_type_id,name,seat_capacity
+S01,2D,230
+S02,3D,180
+S03,IMAX,100
