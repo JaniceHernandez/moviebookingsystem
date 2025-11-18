@@ -58,6 +58,23 @@ class MovieController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  // Get seating arrangement for a specific showtime
+  static async getSeating(req, res) {
+    try {
+      const { showtimeId } = req.query;
+
+      if (!showtimeId) {
+        return res.status(400).json({ error: 'showtimeId is required' });
+      }
+
+      const seating = await MovieModel.getSeatingArrangement(showtimeId);
+      res.status(200).json(seating);
+    } catch (error) {
+      console.error('Controller error:', error);
+      res.status(500).json({ error: error.message || 'Failed to get seating' });
+    }
+  }
 }
 
 module.exports = MovieController;

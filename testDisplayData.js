@@ -17,36 +17,72 @@ async function displayAllData() {
     const comingSoon = await MovieModel.getMoviesByStatus('Coming Soon');
     displayMovies(comingSoon);
 
-    // Fetch and display showtimes for March 10, 2025
-    console.log('\n=== Showtimes for March 10, 2025 ===');
-    const showDate = '2025-10-03';
+    // Test Showtimes + Seating Arrangement
+    const testDate = '2025-12-03'; // Use a valid date from your showtimes data
+    console.log(`\n=== Showtimes & Seating Test for ${testDate} ===`);
+
     for (const movie of allMovies) {
+      const showtimes = await MovieModel.getShowtimesByMovie(movie.movieId, testDate);
+
+      if (showtimes.length === 0) {
+        console.log(`\nMovie: ${movie.title} → No showtimes on ${testDate}`);
+        continue;
+      }
+
       console.log(`\nMovie: ${movie.title}`);
-      const showtimes = await MovieModel.getShowtimesByMovie(movie.movieId, showDate);
       displayShowtimes(showtimes);
+
+      // Test seating arrangement on the FIRST showtime of this movie
+      const firstShowtime = showtimes[0];
+      console.log(`\nFetching seating layout for Showtime ID: ${firstShowtime.showtimeId}`);
+      console.log(`   Cinema: ${firstShowtime.cinema.name} | Time: ${firstShowtime.showTime}`);
+
+      try {
+        const seating = await MovieModel.getSeatingArrangement(firstShowtime.showtimeId);
+
+        console.log(`   Total Seats: ${seating.totalSeats}`);
+        console.log(`   Available: ${seating.availableSeats} | Booked: ${seating.bookedSeats}`);
+
+        // Display sample seats (first 10 + last 5) to avoid flooding console
+        const seatKeys = Object.keys(seating.layout);
+        console.log('   Sample Seats:');
+        seatKeys.slice(0, 10).forEach(seat => {
+          const status = seating.layout[seat] === 'available' ? '✅ available' : '❌ booked';
+          console.log(`     ${seat}: ${status}`);
+        });
+        if (seatKeys.length > 15) {
+          console.log('     ...');
+          seatKeys.slice(-5).forEach(seat => {
+            const status = seating.layout[seat] === 'available' ? '✅ available' : '❌ booked';
+            console.log(`     ${seat}: ${status}`);
+          });
+        }
+        console.log('-'.repeat(50));
+      } catch (seatError) {
+        console.log(`   Failed to load seats: ${seatError.message}`);
+      }
     }
 
-    // Fetch and display all media for each movie
-    console.log('\n=== All Media per Movie ===');
-    for (const movie of allMovies) {
-      console.log(`\nMovie: ${movie.title}`);
-      console.log(`  Primary Poster: ${movie.poster || 'No primary poster'}`);
-      const media = await MovieModel.getMediaByMovie(movie.movieId);
-      const nonPrimaryMedia = media.filter(m => !m.isPrimary);
-      if (nonPrimaryMedia.length === 0) {
-        console.log('  No additional media available');
+    // Optional: Test media again
+    console.log('\n=== Sample Media Test (First Movie Only) ===');
+    if (allMovies.length > 0) {
+      const firstMovie = allMovies[0];
+      console.log(`Movie: ${firstMovie.title}`);
+      console.log(`  Primary Poster: ${firstMovie.poster || 'None'}`);
+      const media = await MovieModel.getMediaByMovie(firstMovie.movieId);
+      if (media.length === 0) {
+        console.log('  No additional media');
       } else {
-        nonPrimaryMedia.forEach(m => {
-          console.log(`  Media ID: ${m.mediaId}, Type: ${m.mediaType}, Path: ${m.path}`);
+        media.forEach(m => {
+          console.log(`  [${m.mediaType}] ${m.path}`);
         });
       }
     }
+
   } catch (error) {
-    console.error('Error displaying data:', {
+    console.error('Test Script Failed:', {
       message: error.message,
-      stack: error.stack,
-      sqlcode: error.sqlcode,
-      sqlstate: error.sqlstate
+      stack: error.stack?.split('\n').slice(0, 5).join('\n'),
     });
   }
 }
@@ -57,37 +93,27 @@ function displayMovies(movies) {
     return;
   }
   movies.forEach(movie => {
-    console.log(`  ID: ${movie.movieId}`);
-    console.log(`  Title: ${movie.title}`);
-    console.log(`  Director: ${movie.director}`);
-    console.log(`  Description: ${movie.description || 'No description available'}`);
-    console.log(`  Release Date: ${movie.releaseDate}`);
-    console.log(`  End Date: ${movie.endDate}`);
-    console.log(`  Duration: ${movie.duration} minutes`);
-    console.log(`  Language: ${movie.language}`);
-    console.log(`  Rating: ${movie.rating.code} - ${movie.rating.description}`);
-    console.log(`  Genres: ${movie.genres.join(', ') || 'No genres available'}`);
-    console.log(`  Status: ${movie.status}`);
-    console.log(`  Primary Poster: ${movie.poster || 'No primary poster'}`);
+    console.log(`  [${movie.movieId}] ${movie.title}`);
+    console.log(`   Director: ${movie.director} | Duration: ${movie.duration} mins`);
+    console.log(`   Status: ${movie.status} | Rating: ${movie.rating.code}`);
+    console.log(`   Genres: ${movie.genres.join(', ') || 'None'}`);
     console.log('-'.repeat(40));
   });
 }
 
 function displayShowtimes(showtimes) {
   if (showtimes.length === 0) {
-    console.log('  No showtimes available');
+    console.log('    → No showtimes');
     return;
   }
   showtimes.forEach(s => {
-    console.log(`  Showtime ID: ${s.showtimeId}`);
-    console.log(`  Date: ${s.showDate}`);
-    console.log(`  Time: ${s.showTime}`);
-    console.log(`  Price: $${s.price}`);
-    console.log(`  Seats Available: ${s.seatsAvailable}`);
-    console.log(`  Cinema: ${s.cinema.name} (${s.cinema.location}, ${s.cinema.screenType})`);
-    console.log('-'.repeat(40));
+    console.log(`    [${s.showtimeId}] ${s.showTime} → ${s.cinema.name} (${s.cinema.location})`);
+    console.log(`       Price: ₱${s.price} | Seats left: ${s.seatsAvailable}`);
   });
 }
 
 // Run the test
-displayAllData();
+console.log('Starting full data retrieval test...\n');
+displayAllData().then(() => {
+  console.log('\nTest completed successfully!');
+});

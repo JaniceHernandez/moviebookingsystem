@@ -190,11 +190,52 @@ class MovieModel {
     }
   }
 
+  // Fetch seating arrangement for a specific showtime
+  static async getSeatingArrangement(showtimeId) {
+    let conn;
+    try {
+      conn = await openConnection();
+      const query = `
+        SELECT 
+          sm.seat_id,
+          sm.status
+        FROM seat_management sm
+        WHERE sm.showtime_id = ?
+        ORDER BY 
+          LENGTH(sm.seat_id), 
+          sm.seat_id
+      `;
+      const rows = await conn.query(query, [showtimeId]);
+
+      // Return structured layout: { "A01": "available", "A02": "booked", ... }
+      const seating = {};
+      rows.forEach(row => {
+        seating[row.SEAT_ID] = row.STATUS; // 'available' or 'booked'
+      });
+
+      return {
+        showtimeId: Number(showtimeId),
+        totalSeats: rows.length,
+        availableSeats: rows.filter(r => r.STATUS === 'available').length,
+        bookedSeats: rows.filter(r => r.STATUS === 'booked').length,
+        layout: seating
+      };
+    } catch (error) {
+      console.error('Error fetching seating arrangement:', error);
+      throw new Error('Failed to fetch seating arrangement');
+    } finally {
+      if (conn) {
+        try { await conn.close(); } catch (closeError) {
+          console.error('Error closing connection:', closeError);
+        }
+      }
+    }
+  }
+
   // Invalidate cache (for admin updates)
   static invalidateCache() {
     MovieModel.cache = null;
     MovieModel.cacheTimestamp = null;
   }
 }
-
 module.exports = MovieModel;

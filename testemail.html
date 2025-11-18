@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CineBook - Movie Booking System</title>
+  <link rel="stylesheet" href="testemail.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header-content center-logo">
+      <div class="logo">CineBook</div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN SCREENS ===== -->
+  <main>
+    <!-- SCREEN 1: MOVIE SELECTION -->
+    <div class="screen active" id="screen1">
+      <div class="tabs">
+        <button class="tab active" data-tab="now-showing">Now Showing</button>
+        <button class="tab" data-tab="coming-soon">Coming Soon</button>
+      </div>
+      <div class="movie-grid" id="now-showing">
+        <div class="movie-card">
+          <div class="movie-poster">Movie Poster</div>
+          <div class="movie-details">
+            <div class="movie-header">
+              <h3 class="movie-title">AVENGERS: ENDGAME</h3>
+              <span class="movie-rating">R-13</span>
+            </div>
+            <button class="btn btn-primary" data-movie="AVENGERS: ENDGAME">Book Now</button>
+          </div>
+        </div>
+        <div class="movie-card">
+          <div class="movie-poster">Movie Poster</div>
+          <div class="movie-details">
+            <div class="movie-header">
+              <h3 class="movie-title">SPIDER-MAN: NO WAY HOME</h3>
+              <span class="movie-rating">PG-13</span>
+            </div>
+            <button class="btn btn-primary" data-movie="SPIDER-MAN: NO WAY HOME">Book Now</button>
+          </div>
+        </div>
+        <div class="movie-card">
+          <div class="movie-poster">Movie Poster</div>
+          <div class="movie-details">
+            <div class="movie-header">
+              <h3 class="movie-title">DUNE: PART TWO</h3>
+              <span class="movie-rating">PG-13</span>
+            </div>
+            <button class="btn btn-primary" data-movie="DUNE: PART TWO">Book Now</button>
+          </div>
+        </div>
+        <div class="movie-card">
+          <div class="movie-poster">Movie Poster</div>
+          <div class="movie-details">
+            <div class="movie-header">
+              <h3 class="movie-title">INCEPTION (RE-RUN)</h3>
+              <span class="movie-rating">PG-13</span>
+            </div>
+            <button class="btn btn-primary" data-movie="INCEPTION (RE-RUN)">Book Now</button>
+          </div>
+        </div>
+      </div>
+      <div class="movie-grid" id="coming-soon" style="display:none;">
+        <div class="movie-card">
+          <div class="movie-poster">Movie Poster</div>
+          <div class="movie-details">
+            <div class="movie-header">
+              <h3 class="movie-title">BLACK PANTHER: WAKANDA FOREVER</h3>
+              <span class="movie-rating">PG</span>
+            </div>
+            <button class="btn btn-secondary">View Details</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: MOVIE DETAILS -->
+    <div class="screen" id="screen2">
+      <div class="progress-tabs">
+        <div class="progress-step active">Movie Details</div>
+        <div class="progress-step">Select Seats</div>
+        <div class="progress-step">Confirmation & Payment</div>
+      </div>
+      <div class="movie-detail-container">
+        <div class="fade-carousel">
+          <div class="carousel-item active"><div class="carousel-label-center">Image 1</div></div>
+          <div class="carousel-item"><div class="carousel-label-center">Image 2</div></div>
+          <div class="carousel-item"><div class="carousel-label-center">Image 3</div></div>
+          <button class="carousel-btn prev">&lt;</button>
+          <button class="carousel-btn next">&gt;</button>
+        </div>
+        <div class="movie-info">
+          <h2 class="movie-title" id="detailTitle">AVENGERS: ENDGAME</h2>
+          <span class="movie-rating">R-13</span>
+          <div class="movie-details-table">
+            <div class="movie-row"><span class="label">Genre:</span><span class="value">Action, Adventure, Drama</span></div>
+            <div class="movie-row"><span class="label">Director:</span><span class="value">Anthony Russo, Joe Russo</span></div>
+            <div class="movie-row"><span class="label">Cast:</span><span class="value">Robert Downey Jr., Chris Evans, Mark Ruffalo</span></div>
+            <div class="movie-row"><span class="label">Duration:</span><span class="value">3 hrs 1 min</span></div>
+            <div class="movie-row description-row">
+              <span class="label">Description:</span>
+              <span class="value">After the devastating events of <em>Avengers: Infinity War</em>, the universe is in ruins...</span>
+            </div>
+          </div>
+          <div class="select-section">
+            <label>Branch:</label>
+            <label>Date:</label>
+            <label>Time:</label>
+            <select id="branch"><option value="">-- Select Branch --</option><option>NEU Fairview</option><option>NEU Manila</option></select>
+            <select id="date"><option value="">-- Select Date --</option><option>Oct 8, 2025</option><option>Oct 9, 2025</option></select>
+            <select id="time"><option value="">-- Select Time --</option><option>1:00 PM</option><option>4:00 PM</option><option>7:00 PM</option></select>
+          </div>
+          <div class="movie-buttons full">
+            <button class="btn btn-outline" onclick="showScreen(1)">Back</button>
+            <button id="bookNowBtn" class="btn btn-primary" disabled>Book Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: SEAT SELECTION -->
+    <div class="screen" id="screen3">
+      <div class="progress-tabs">
+        <div class="progress-step">Movie Details</div>
+        <div class="progress-step active">Select Seats</div>
+        <div class="progress-step">Confirmation & Payment</div>
+      </div>
+      <div class="seat-page">
+        <aside class="booking-summary">
+          <h3>Booking Summary</h3>
+          <div class="summary-row"><span class="slabel">Movie:</span><span id="sumMovie" class="svalue">-</span></div>
+          <div class="summary-row"><span class="slabel">Date:</span><span id="sumDate" class="svalue">-</span></div>
+          <div class="summary-row"><span class="slabel">Time:</span><span id="sumTime" class="svalue">-</span></div>
+          <div class="summary-row"><span class="slabel">Theater:</span><span id="sumTheater" class="svalue">-</span></div>
+          <hr>
+          <div class="qty-row">
+            <span class="slabel">Quantity:</span>
+            <div class="qty-controls">
+              <button id="qtyMinus" class="qty-btn">-</button>
+              <input id="qtyInput" type="number" value="1" min="1" readonly />
+              <button id="qtyPlus" class="qty-btn">+</button>
+            </div>
+          </div>
+          <div class="summary-row"><span class="slabel">Seats:</span><div id="sumSeats" class="svalue">None</div></div>
+          <hr>
+          <div class="summary-row"><span class="slabel">Price:</span><span id="sumPrice" class="svalue">₱200</span></div>
+          <div class="summary-row total"><span class="slabel">Total:</span><span id="sumTotal" class="svalue">₱0</span></div>
+          <div class="summary-note">* Select quantity then click seats</div>
+        </aside>
+        <section class="seat-selection">
+          <div class="cinema-screen">SCREEN</div>
+          <div class="seat-map-wrapper">
+            <div class="seat-grid" id="seatGrid"></div>
+            <div class="seat-numbers" id="seatNumbers"></div>
+          </div>
+          <div class="seat-legend">
+            <div><span class="legend-seat available"></span> Available</div>
+            <div><span class="legend-seat selected"></span> Selected</div>
+            <div><span class="legend-seat booked"></span> Booked</div>
+          </div>
+          <div class="movie-buttons full action-buttons">
+            <button class="btn btn-outline" onclick="showScreen(2)">Back</button>
+            <button id="confirmSeatsBtn" class="btn btn-primary" disabled>Confirm Booking</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- CUSTOMER INFO MODAL -->
+    <div id="customerModal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close">×</span>
+        <h2>Enter Your Details</h2>
+        <p>We need this to send your ticket confirmation.</p>
+        <div class="form-group">
+          <label>Full Name <span style="color:red">*</span></label>
+          <input type="text" id="custName" placeholder="Juan Dela Cruz" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address <span style="color:red">*</span></label>
+          <input type="email" id="custEmail" placeholder="juan@example.com" required>
+        </div>
+        <div class="form-group">
+          <label>Phone Number <span style="color:red">*</span></label>
+          <input type="text" id="custPhone" placeholder="09171234567" maxlength="11" required>
+        </div>
+        <button id="continueToPayment" class="btn btn-primary full-width">Continue to Payment</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: PAYMENT -->
+    <div class="screen" id="screen4">
+      <div class="progress-tabs">
+        <div class="progress-step">Movie Details</div>
+        <div class="progress-step">Select Seats</div>
+        <div class="progress-step active">Confirmation & Payment</div>
+      </div>
+      <div class="payment-page">
+        <div class="payment-container">
+          <h2>Complete Your Booking</h2>
+          <div class="payment-summary">
+            <h3>Order Summary</h3>
+            <div><strong>Movie:</strong> <span id="payMovie"></span></div>
+            <div><strong>Theater:</strong> <span id="payTheater"></span></div>
+            <div><strong>Date & Time:</strong> <span id="payDateTime"></span></div>
+            <div><strong>Seats:</strong> <span id="paySeats"></span></div>
+            <div class="total-pay"><strong>Total:</strong> <span id="payTotal">₱0</span></div>
+          </div>
+          <div class="customer-details">
+            <h3>Your Contact Information</h3>
+            <div class="form-group"><label>Name:</label> <strong id="displayName"></strong></div>
+            <div class="form-group"><label>Email:</label> <strong id="displayEmail"></strong></div>
+            <div class="form-group"><label>Phone:</label> <strong id="displayPhone"></strong></div>
+          </div>
+          <div class="payment-methods">
+            <h3>Payment Method</h3>
+            <div class="method-tabs">
+              <button class="method-tab active" data-method="card">Credit/Debit Card</button>
+              <button class="method-tab" data-method="gcash">GCash</button>
+            </div>
+            <div id="cardForm" class="payment-form active">
+              <input type="text" placeholder="Card Number" maxlength="19">
+              <div class="form-row">
+                <input type="text" placeholder="MM/YY" maxlength="5">
+                <input type="text" placeholder="CVV" maxlength="4">
+              </div>
+              <input type="text" placeholder="Cardholder Name">
+            </div>
+            <div id="gcashForm" class="payment-form">
+              <input type="text" placeholder="GCash Number (09xxxxxxxxx)" maxlength="11">
+              <input type="text" placeholder="6-Digit OTP"maxlength="6">
+            </div>
+            <button id="payNowBtn" class="btn btn-primary full-width">Pay Now & Confirm Booking</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 5: SUCCESS -->
+    <div class="screen" id="screen5">
+      <div class="success-container">
+        <div class="success-checkmark">Checkmark</div>
+        <h1>Booking Confirmed!</h1>
+        <p>Thank you! Your tickets are confirmed.</p>
+        <div class="success-details">
+          <h2>Your Order Details</h2>
+          <div class="detail-row"><strong>Order ID:</strong> <span id="successOrderID"></span></div>
+          <div class="detail-row"><strong>Name:</strong> <span id="successName"></span></div>
+          <div class="detail-row"><strong>Email:</strong> <span id="successEmail"></span></div>
+          <div class="detail-row"><strong>Movie:</strong> <span id="successMovie"></span></div>
+          <div class="detail-row"><strong>Theater:</strong> <span id="successTheater"></span></div>
+          <div class="detail-row"><strong>Date & Time:</strong> <span id="successDateTime"></span></div>
+          <div class="detail-row"><strong>Seats:</strong> <span id="successSeats"></span></div>
+          <div class="detail-row total"><strong>Total Paid:</strong> <span id="successTotal"></span></div>
+        </div>
+        <div class="success-actions">
+          <button class="btn btn-primary" onclick="location.reload()">Book Another Movie</button>
+          <button class="btn btn-outline" onclick="window.print()">Print Ticket</button>
+        </div>
+        <p class="success-note">A confirmation email has been sent to <strong id="successEmailNote"></strong></p>
+      </div>
+    </div>
+  </main>
+
+  <script src="testemail.js"></script>
+</body>
+</html>
